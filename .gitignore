@@ -1,0 +1,41 @@
+# Archivos y directorios a ignorar
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Testing
+coverage/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/migrations/
+
+# Stress test results
+stress-test-results.json
+
+# Temporary files
+*.tmp
+*.temp
