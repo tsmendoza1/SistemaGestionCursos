@@ -10,6 +10,13 @@ interface CursoFormData {
     area: string;
 }
 
+interface FormErrors {
+    nombre?: string;
+    descripcion?: string;
+    creditos?: string;
+    area?: string;
+}
+
 export default function CursoEditPage() {
     const router = useRouter();
     const params = useParams();
@@ -21,7 +28,7 @@ export default function CursoEditPage() {
         area: 'Ingeniería',
     });
 
-    const [errors, setErrors] = useState<Partial<CursoFormData>>({});
+    const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(true);
 
@@ -54,7 +61,7 @@ export default function CursoEditPage() {
     };
 
     const validate = (): boolean => {
-        const newErrors: Partial<CursoFormData> = {};
+        const newErrors: FormErrors = {};
 
         if (!formData.nombre.trim()) {
             newErrors.nombre = 'El nombre es obligatorio';
