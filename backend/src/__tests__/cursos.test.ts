@@ -1,19 +1,12 @@
 import request from 'supertest';
 import app from '../index';
-import prisma from '../prisma';
+import pool from '../db';
 
-// Mock Prisma client
-jest.mock('../prisma', () => ({
+// Mock pg pool
+jest.mock('../db', () => ({
     __esModule: true,
     default: {
-        curso: {
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-            aggregate: jest.fn(),
-        },
+        query: jest.fn(),
     },
 }));
 
@@ -29,16 +22,13 @@ describe('Cursos API', () => {
                 { id: 2, nombre: 'Física', descripcion: 'Curso de física', creditos: 5, area: 'Ciencias' },
             ];
 
-            (prisma.curso.findMany as jest.Mock).mockResolvedValue(mockCursos);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: mockCursos });
 
             const response = await request(app).get('/cursos');
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockCursos);
-            expect(prisma.curso.findMany).toHaveBeenCalledWith({
-                where: undefined,
-                orderBy: { id: 'asc' },
-            });
+            expect(pool.query).toHaveBeenCalledWith('SELECT * FROM cursos ORDER BY id ASC', []);
         });
 
         it('should filter cursos by area', async () => {
@@ -46,20 +36,17 @@ describe('Cursos API', () => {
                 { id: 1, nombre: 'Matemáticas', descripcion: 'Curso de matemáticas', creditos: 4, area: 'Ingeniería' },
             ];
 
-            (prisma.curso.findMany as jest.Mock).mockResolvedValue(mockCursos);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: mockCursos });
 
             const response = await request(app).get('/cursos?area=Ingeniería');
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockCursos);
-            expect(prisma.curso.findMany).toHaveBeenCalledWith({
-                where: { area: 'Ingeniería' },
-                orderBy: { id: 'asc' },
-            });
+            expect(pool.query).toHaveBeenCalledWith('SELECT * FROM cursos WHERE area = $1 ORDER BY id ASC', ['Ingeniería']);
         });
 
         it('should handle errors', async () => {
-            (prisma.curso.findMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+            (pool.query as jest.Mock).mockRejectedValue(new Error('Database error'));
 
             const response = await request(app).get('/cursos');
 
@@ -70,8 +57,8 @@ describe('Cursos API', () => {
 
     describe('GET /cursos/promedio-creditos', () => {
         it('should return average credits', async () => {
-            (prisma.curso.aggregate as jest.Mock).mockResolvedValue({
-                _avg: { creditos: 4.5 },
+            (pool.query as jest.Mock).mockResolvedValue({
+                rows: [{ promedio: '4.5' }],
             });
 
             const response = await request(app).get('/cursos/promedio-creditos');
@@ -81,8 +68,8 @@ describe('Cursos API', () => {
         });
 
         it('should return 0 when no cursos exist', async () => {
-            (prisma.curso.aggregate as jest.Mock).mockResolvedValue({
-                _avg: { creditos: null },
+            (pool.query as jest.Mock).mockResolvedValue({
+                rows: [{ promedio: null }],
             });
 
             const response = await request(app).get('/cursos/promedio-creditos');
@@ -96,7 +83,7 @@ describe('Cursos API', () => {
         it('should return a curso by id', async () => {
             const mockCurso = { id: 1, nombre: 'Matemáticas', descripcion: 'Curso de matemáticas', creditos: 4, area: 'Ciencias' };
 
-            (prisma.curso.findUnique as jest.Mock).mockResolvedValue(mockCurso);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [mockCurso] });
 
             const response = await request(app).get('/cursos/1');
 
@@ -105,7 +92,7 @@ describe('Cursos API', () => {
         });
 
         it('should return 404 when curso not found', async () => {
-            (prisma.curso.findUnique as jest.Mock).mockResolvedValue(null);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
             const response = await request(app).get('/cursos/999');
 
@@ -125,7 +112,7 @@ describe('Cursos API', () => {
 
             const createdCurso = { id: 1, ...newCurso };
 
-            (prisma.curso.create as jest.Mock).mockResolvedValue(createdCurso);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [createdCurso] });
 
             const response = await request(app).post('/cursos').send(newCurso);
 
@@ -153,7 +140,7 @@ describe('Cursos API', () => {
                 area: 'Ciencias',
             };
 
-            (prisma.curso.update as jest.Mock).mockResolvedValue(updatedCurso);
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [updatedCurso] });
 
             const response = await request(app).put('/cursos/1').send({
                 nombre: 'Matemáticas Avanzadas',
@@ -165,7 +152,7 @@ describe('Cursos API', () => {
         });
 
         it('should return 404 when curso not found', async () => {
-            (prisma.curso.update as jest.Mock).mockRejectedValue({ code: 'P2025' });
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
             const response = await request(app).put('/cursos/999').send({
                 nombre: 'Test',
@@ -178,7 +165,7 @@ describe('Cursos API', () => {
 
     describe('DELETE /cursos/:id', () => {
         it('should delete a curso', async () => {
-            (prisma.curso.delete as jest.Mock).mockResolvedValue({});
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [{ id: 1 }] });
 
             const response = await request(app).delete('/cursos/1');
 
@@ -186,7 +173,7 @@ describe('Cursos API', () => {
         });
 
         it('should return 404 when curso not found', async () => {
-            (prisma.curso.delete as jest.Mock).mockRejectedValue({ code: 'P2025' });
+            (pool.query as jest.Mock).mockResolvedValue({ rows: [] });
 
             const response = await request(app).delete('/cursos/999');
 

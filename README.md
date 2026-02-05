@@ -1,80 +1,52 @@
 # Sistema de Gestión de Cursos
 
-Sistema web completo para la gestión de cursos académicos, implementado con arquitectura cliente-servidor utilizando Node.js, Next.js y PostgreSQL.
+Sistema full-stack para la gestión de cursos académicos con backend en Node.js/Express y frontend en React.
 
-## 📋 Tabla de Contenidos
-
-- [Características](#características)
-- [Tecnologías](#tecnologías)
-- [Requisitos Previos](#requisitos-previos)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Ejecución](#ejecución)
-- [Pruebas](#pruebas)
-- [API Endpoints](#api-endpoints)
-- [Despliegue](#despliegue)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-
-## ✨ Características
-
-### Backend (API REST)
-- ✅ **CRUD Completo**: Crear, Listar, Buscar, Actualizar y Eliminar cursos
-- ✅ **Filtrado por Área**: Endpoint `/cursos?area=Ingeniería`
-- ✅ **Cálculo de Promedio**: Endpoint `/cursos/promedio-creditos`
-- ✅ **Validación de Datos**: Validaciones en campos obligatorios
-- ✅ **Manejo de Errores**: Respuestas apropiadas (404, 400, 500)
-- ✅ **Monitoreo**: Health check y métricas de rendimiento
-- ✅ **Base de Datos**: PostgreSQL con Prisma ORM
-
-### Frontend (Next.js)
-- ✅ **Vista de Tabla**: Listado completo de cursos
-- ✅ **Formularios**: Crear y editar cursos con validaciones
-- ✅ **Vista de Detalle**: Información completa de cada curso
-- ✅ **Filtros**: Filtrado dinámico por área
-- ✅ **Estadísticas**: Visualización del promedio de créditos
-- ✅ **Diseño Responsivo**: Interfaz adaptable a diferentes dispositivos
-
-### Testing
-- ✅ **Pruebas Unitarias Backend**: Jest + Supertest
-- ✅ **Pruebas Unitarias Frontend**: Jest + Testing Library
-- ✅ **Pruebas de Estrés**: k6 con usuarios concurrentes
-
-## 🛠 Tecnologías
+## Tecnologías Utilizadas
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **ORM**: Prisma
-- **Base de Datos**: PostgreSQL
-- **Testing**: Jest, Supertest
-- **Lenguaje**: TypeScript
+- **Node.js** con **Express**
+- **TypeScript**
+- **PostgreSQL** (sin ORM, queries directas con pg)
+- **Jest** para testing
+- **Supertest** para tests de integración
 
 ### Frontend
-- **Framework**: Next.js 16
-- **Lenguaje**: TypeScript
-- **Estilos**: Tailwind CSS
-- **Testing**: Jest, Testing Library
+- **React** con **TypeScript**
+- **Vite** como build tool
+- **Axios** para peticiones HTTP
+- **CSS** para estilos
 
-### DevOps
-- **Stress Testing**: k6
-- **Despliegue Backend**: Render
-- **Despliegue Frontend**: Vercel
-- **Base de Datos**: Render PostgreSQL
+## Requisitos Previos
 
-## 📦 Requisitos Previos
-
-- Node.js >= 18.x
-- PostgreSQL >= 14.x
+- Node.js (v18 o superior)
+- PostgreSQL (v14 o superior)
 - npm o yarn
-- k6 (para pruebas de estrés)
 
-## 🚀 Instalación
+## Configuración del Proyecto
 
-### 1. Clonar el Repositorio
+### 1. Configurar Base de Datos
 
+1. Crear la base de datos PostgreSQL:
 ```bash
-git clone <repository-url>
-cd ExamenIngenieriaWeb
+createdb cursos_db
+```
+
+2. Configurar la variable de entorno en `backend/.env`:
+```env
+DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/cursos_db
+PORT=3001
+```
+
+3. Inicializar la base de datos con el script SQL:
+```bash
+cd backend
+psql -d cursos_db -f scripts/init.sql
+```
+
+O en Windows:
+```bash
+psql -U postgres -d cursos_db -f scripts/init.sql
 ```
 
 ### 2. Instalar Dependencias del Backend
@@ -87,314 +59,275 @@ npm install
 ### 3. Instalar Dependencias del Frontend
 
 ```bash
-cd ../frontend
+cd frontend
 npm install
 ```
 
-## ⚙️ Configuración
+## Scripts Disponibles
 
 ### Backend
 
-1. Crear archivo `.env` en la carpeta `backend`:
-
-```env
-DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/cursos_db"
-PORT=3001
-```
-
-2. Ejecutar migraciones de base de datos:
-
 ```bash
-# Opción 1: Usar Prisma
-npx prisma migrate dev --name init
-npx prisma generate
+# Modo desarrollo
+npm run dev
 
-# Opción 2: Usar script SQL directo
-psql -U usuario -d cursos_db -f ../database/migration.sql
+# Compilar TypeScript
+npm run build
+
+# Ejecutar en producción
+npm run start
+
+# Ejecutar tests
+npm run test
+
+# Tests en modo watch
+npm run test:watch
+
+# Inicializar base de datos
+npm run init-db
 ```
 
 ### Frontend
 
-1. Crear archivo `.env.local` en la carpeta `frontend`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
-
-## 🏃 Ejecución
-
-### Desarrollo
-
-#### Backend
 ```bash
-cd backend
+# Modo desarrollo
 npm run dev
-# Servidor corriendo en http://localhost:3001
-```
 
-#### Frontend
-```bash
-cd frontend
-npm run dev
-# Aplicación corriendo en http://localhost:3000
-```
-
-### Producción
-
-#### Backend
-```bash
-cd backend
+# Compilar para producción
 npm run build
-npm start
+
+# Preview de producción
+npm run preview
 ```
 
-#### Frontend
-```bash
-cd frontend
-npm run build
-npm start
-```
-
-## 🧪 Pruebas
-
-### Pruebas Unitarias Backend
-
-```bash
-cd backend
-npm test
-
-# Modo watch
-npm run test:watch
-```
-
-**Cobertura**: Pruebas para todos los endpoints CRUD, filtros y cálculos.
-
-### Pruebas Unitarias Frontend
-
-```bash
-cd frontend
-npm test
-
-# Modo watch
-npm run test:watch
-```
-
-**Cobertura**: Componentes, servicios API y casos de error.
-
-### Pruebas de Estrés (k6)
-
-```bash
-# Instalar k6 (si no está instalado)
-# Windows: choco install k6
-# macOS: brew install k6
-# Linux: https://k6.io/docs/getting-started/installation/
-
-# Ejecutar pruebas de estrés
-k6 run stress-test.js
-
-# Con URL personalizada
-k6 run -e API_URL=http://localhost:3001 stress-test.js
-```
-
-**Configuración de Carga**:
-- Ramp-up: 10 → 50 → 100 usuarios concurrentes
-- Duración: 3 minutos
-- Métricas: Tiempo de respuesta, tasa de errores
-
-## 📡 API Endpoints
-
-### Base URL
-```
-http://localhost:3001
-```
-
-### Endpoints
-
-#### Health Check
-```http
-GET /health
-```
-Respuesta: Estado del servidor y métricas
-
-#### Listar Cursos
-```http
-GET /cursos
-GET /cursos?area=Ingeniería
-```
-Respuesta: Array de cursos
-
-#### Obtener Curso por ID
-```http
-GET /cursos/:id
-```
-Respuesta: Objeto curso
-
-#### Crear Curso
-```http
-POST /cursos
-Content-Type: application/json
-
-{
-  "nombre": "Cálculo Diferencial",
-  "descripcion": "Introducción al cálculo",
-  "creditos": 4,
-  "area": "Ingeniería"
-}
-```
-Respuesta: Curso creado (201)
-
-#### Actualizar Curso
-```http
-PUT /cursos/:id
-Content-Type: application/json
-
-{
-  "creditos": 5
-}
-```
-Respuesta: Curso actualizado
-
-#### Eliminar Curso
-```http
-DELETE /cursos/:id
-```
-Respuesta: 204 No Content
-
-#### Promedio de Créditos
-```http
-GET /cursos/promedio-creditos
-```
-Respuesta:
-```json
-{
-  "promedioCreditos": 4.2
-}
-```
-
-## 🌐 Despliegue
-
-### Backend en Render
-
-1. Crear nuevo Web Service en Render
-2. Conectar repositorio
-3. Configurar:
-   - **Build Command**: `cd backend && npm install && npx prisma generate`
-   - **Start Command**: `cd backend && npm start`
-   - **Environment Variables**: `DATABASE_URL`
-
-4. Crear PostgreSQL database en Render
-5. Conectar database al Web Service
-
-### Frontend en Vercel
-
-1. Importar proyecto en Vercel
-2. Configurar:
-   - **Framework Preset**: Next.js
-   - **Root Directory**: `frontend`
-   - **Environment Variables**: `NEXT_PUBLIC_API_URL`
-
-3. Deploy automático en cada push
-
-### Base de Datos
-
-**Render PostgreSQL**:
-1. Crear PostgreSQL instance
-2. Copiar `DATABASE_URL`
-3. Ejecutar migraciones:
-```bash
-psql <DATABASE_URL> -f database/migration.sql
-```
-
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ExamenIngenieriaWeb/
 ├── backend/
 │   ├── src/
-│   │   ├── __tests__/         # Pruebas unitarias
-│   │   ├── middleware/         # Middleware de monitoreo
-│   │   ├── routes/             # Rutas de la API
-│   │   ├── index.ts            # Punto de entrada
-│   │   └── prisma.ts           # Cliente Prisma
-│   ├── prisma/
-│   │   └── schema.prisma       # Esquema de base de datos
+│   │   ├── __tests__/
+│   │   │   └── cursos.test.ts
+│   │   ├── middleware/
+│   │   │   └── monitoring.ts
+│   │   ├── routes/
+│   │   │   └── cursos.ts
+│   │   ├── db.ts
+│   │   └── index.ts
+│   ├── scripts/
+│   │   └── init.sql
 │   ├── package.json
-│   ├── tsconfig.json
-│   └── jest.config.js
-│
+│   └── tsconfig.json
 ├── frontend/
-│   ├── app/
-│   │   ├── cursos/             # Páginas de cursos
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── lib/
-│   │   └── api.ts              # Servicio API
-│   ├── __tests__/              # Pruebas unitarias
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── jest.config.js
-│
-├── database/
-│   └── migration.sql           # Script de migración SQL
-│
-├── stress-test.js              # Pruebas de estrés k6
+│   ├── src/
+│   │   ├── components/
+│   │   ├── services/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   └── package.json
 └── README.md
 ```
 
-## 📊 Monitoreo
+## API Endpoints
 
-### Backend Metrics
+### Cursos
 
-Endpoint `/health` proporciona:
-- Estado del servicio
-- Uptime
-- Número de requests
-- Tiempo promedio de respuesta
-- Tasa de errores
+- `GET /cursos` - Listar todos los cursos (opcional: `?area=nombre_area`)
+- `GET /cursos/:id` - Obtener un curso por ID
+- `GET /cursos/promedio-creditos` - Calcular promedio de créditos
+- `POST /cursos` - Crear un nuevo curso
+- `PUT /cursos/:id` - Actualizar un curso
+- `DELETE /cursos/:id` - Eliminar un curso
 
-Ejemplo:
+### Health Check
+
+- `GET /health` - Verificar estado del servidor
+
+## Modelo de Datos
+
+### Tabla: cursos
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| id | SERIAL | ID autoincremental (PK) |
+| nombre | VARCHAR(255) | Nombre del curso |
+| descripcion | TEXT | Descripción del curso |
+| creditos | INTEGER | Número de créditos |
+| area | VARCHAR(100) | Área académica |
+| created_at | TIMESTAMP | Fecha de creación |
+| updated_at | TIMESTAMP | Fecha de actualización |
+
+## Testing
+
+El proyecto incluye tests unitarios y de integración:
+
+### Pruebas Unitarias
+
+```bash
+cd backend
+npm test
+```
+
+O usando el script batch:
+```bash
+.\run-tests.bat
+```
+
+Los tests cubren:
+- CRUD completo de cursos
+- Filtrado por área
+- Cálculo de promedio de créditos
+- Manejo de errores
+- Validación de datos
+
+**Total: 13 tests** que validan todos los endpoints de la API.
+
+### Pruebas de Estrés
+
+El proyecto incluye un script de pruebas de estrés que ejecuta **2,600+ peticiones concurrentes**:
+
+```bash
+# Asegúrate de que el servidor esté corriendo primero
+cd backend
+npm run dev
+
+# En otra terminal, ejecuta las pruebas de estrés
+.\run-stress-tests.bat
+```
+
+O directamente:
+```bash
+cd backend
+node stress-test.js
+```
+
+Las pruebas de estrés incluyen:
+- 1,000 peticiones GET /cursos (50 concurrentes)
+- 500 peticiones GET /cursos/promedio-creditos (50 concurrentes)
+- 500 peticiones GET /cursos?area=Informática (50 concurrentes)
+- 100 peticiones POST /cursos (10 concurrentes)
+- 500 peticiones GET /cursos/:id (50 concurrentes)
+
+**Métricas reportadas:**
+- Total de peticiones exitosas/fallidas
+- Tiempo total de ejecución
+- Peticiones por segundo (throughput)
+- Tiempos de respuesta (promedio, min, max, P50, P95, P99)
+
+### Pruebas de Estrés con K6 + Grafana (Profesional)
+
+Para pruebas de estrés con visualización en tiempo real:
+
+**Requisitos:**
+- K6 instalado: https://k6.io/docs/get-started/installation/
+- Docker Desktop (para Grafana e InfluxDB)
+
+**Iniciar infraestructura:**
+```bash
+docker-compose up -d
+```
+
+**Ejecutar pruebas:**
+```bash
+.\run-k6-tests.bat
+```
+
+O directamente:
+```bash
+# Modo básico (solo consola)
+cd backend
+k6 run k6-stress-test.js
+
+# Modo Grafana (visualización en tiempo real)
+k6 run --out influxdb=http://localhost:8086/k6 k6-stress-test.js
+```
+
+**Acceder a Grafana:**
+- URL: http://localhost:3000
+- Usuario: admin / Password: admin
+- Importar dashboard ID: 2587 (K6 Load Testing Results)
+
+**Configuración de la prueba:**
+- Ramp-up: 0 → 100 usuarios en 3.5 minutos
+- Carga sostenida: 100 usuarios por 1 minuto
+- Ramp-down: 100 → 0 usuarios en 30 segundos
+- Duración total: ~5 minutos
+- Endpoints probados: GET, POST, filtros, health check
+
+## Monitoreo
+
+El backend incluye middleware de monitoreo que registra:
+- Tiempo de respuesta de cada request
+- Método HTTP y ruta
+- Código de estado de respuesta
+- Contador de peticiones totales
+- Promedio de tiempo de respuesta
+- Contador de errores
+
+### Health Check Endpoint
+
+Consulta el estado del servidor y métricas en tiempo real:
+
+```bash
+GET http://localhost:3001/health
+```
+
+Respuesta:
 ```json
 {
   "status": "healthy",
-  "uptime": 3600,
-  "timestamp": "2026-02-05T19:00:00.000Z",
+  "uptime": 123.456,
+  "timestamp": "2026-02-05T20:15:30.123Z",
   "metrics": {
-    "requestCount": 1523,
-    "averageResponseTime": "45.23ms",
-    "errors": 12
+    "requestCount": 150,
+    "averageResponseTime": "12.34ms",
+    "errors": 2
   }
 }
 ```
 
-## 🐛 Solución de Problemas
+## Desarrollo
 
-### Error de Conexión a Base de Datos
+### Ejecutar en modo desarrollo
+
+1. Terminal 1 - Backend:
 ```bash
-# Verificar que PostgreSQL esté corriendo
-psql -U postgres -c "SELECT version();"
-
-# Verificar DATABASE_URL en .env
-echo $DATABASE_URL
+cd backend
+npm run dev
 ```
 
-### Error de CORS
-Verificar que el frontend esté configurado en `cors()` del backend.
-
-### Pruebas Fallan
+2. Terminal 2 - Frontend:
 ```bash
-# Limpiar node_modules y reinstalar
-rm -rf node_modules package-lock.json
-npm install
+cd frontend
+npm run dev
 ```
 
-## 📝 Licencia
+El backend estará disponible en `http://localhost:3001`
+El frontend estará disponible en `http://localhost:5173`
 
-Este proyecto fue desarrollado como parte de un examen de Ingeniería Web.
+## Notas Importantes
 
-## 👥 Autor
+- El proyecto **NO usa Prisma** ni ningún ORM
+- Todas las queries se realizan directamente con el driver `pg` de PostgreSQL
+- El script `init.sql` incluye:
+  - Creación de tabla con constraints
+  - Índices para optimización
+  - Trigger para actualización automática de `updated_at`
+  - Datos de ejemplo (10 cursos)
 
-[Tu Nombre]
+## Limpieza de Dependencias Antiguas
 
-## 📞 Contacto
+Si el proyecto anteriormente usaba Prisma, ejecutar:
 
-Para preguntas o soporte, contactar a [tu-email@ejemplo.com]
+```bash
+# Windows
+remove-prisma.bat
+
+# Linux/Mac
+cd backend
+npm uninstall @prisma/client @prisma/adapter-pg prisma
+```
+
+## Licencia
+
+ISC

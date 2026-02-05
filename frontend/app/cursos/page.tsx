@@ -76,7 +76,7 @@ export default function CursosPage() {
         }
     };
 
-    const areas = ['Todas', 'Ingeniería', 'Ciencias', 'Humanidades', 'Artes'];
+    const areas = ['Todas', 'Informática', 'Matemáticas', 'Física', 'Química'];
 
     if (loading && cursos.length === 0) {
         return (
