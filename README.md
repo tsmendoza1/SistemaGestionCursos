@@ -63,6 +63,37 @@ cd frontend
 npm install
 ```
 
+### Licencia
+
+ISC
+
+---
+
+## 🚀 Despliegue en Producción
+
+### Render (Backend + PostgreSQL)
+
+1. **Crear base de datos PostgreSQL en Render**
+2. **Crear Web Service en Render**:
+   - Root Directory: `backend`
+   - Build Command: `npm install && npm run build`
+   - Start Command: `npm start`
+   - Variables de entorno:
+     - `DATABASE_URL`: Internal Database URL de Render
+     - `NODE_ENV`: `production`
+     - `PORT`: `3001`
+
+### Vercel (Frontend)
+
+1. **Importar proyecto desde GitHub**
+2. **Configurar**:
+   - Root Directory: `frontend`
+   - Framework: Next.js
+   - Variable de entorno:
+     - `NEXT_PUBLIC_API_URL`: URL del backend en Render
+
+Ver guía completa de despliegue en la documentación del proyecto.
+
 ## Scripts Disponibles
 
 ### Backend
@@ -314,20 +345,3 @@ El frontend estará disponible en `http://localhost:5173`
   - Índices para optimización
   - Trigger para actualización automática de `updated_at`
   - Datos de ejemplo (10 cursos)
-
-## Limpieza de Dependencias Antiguas
-
-Si el proyecto anteriormente usaba Prisma, ejecutar:
-
-```bash
-# Windows
-remove-prisma.bat
-
-# Linux/Mac
-cd backend
-npm uninstall @prisma/client @prisma/adapter-pg prisma
-```
-
-## Licencia
-
-ISC

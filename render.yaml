@@ -1,0 +1,25 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: cursos-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cursos-db
+          property: connectionString
+    healthCheckPath: /health
+
+# PostgreSQL Database
+databases:
+  - name: cursos-db
+    plan: free
+    databaseName: cursos_db
+    user: cursos_user
