@@ -12,7 +12,10 @@ if (!DATABASE_URL) {
 }
 
 async function initializeDatabase() {
-    const pool = new Pool({ connectionString: DATABASE_URL });
+    const pool = new Pool({
+        connectionString: DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    });
 
     try {
         console.log('🔌 Conectando a la base de datos...');

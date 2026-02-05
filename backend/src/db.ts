@@ -2,6 +2,11 @@ import { Pool } from 'pg';
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:root@localhost:5432/cursos_db';
 
+console.log('🔌 DB Config:', {
+    usingEnvVar: !!process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL ? 'Set via ENV' : 'Fallback to Localhost'
+});
+
 const pool = new Pool({
     connectionString,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,

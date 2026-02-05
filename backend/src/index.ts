@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cursosRouter from './routes/cursos';
 import { healthCheck, metricsMiddleware } from './middleware/monitoring';
+import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
@@ -21,10 +22,7 @@ app.get('/health', healthCheck);
 app.use('/cursos', cursosRouter);
 
 // Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Internal Server Error', message: err.message });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
